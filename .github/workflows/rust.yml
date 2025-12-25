@@ -61,32 +61,19 @@ jobs:
         if: matrix.test && github.event_name != 'release'
         run: cargo test --release
 
-      - name: Generate SHA256 (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          cd target/${{ matrix.target }}/release
-          sha256sum ${{ env.BIN_NAME }} > ${{ env.BIN_NAME }}.sha256
-
-      - name: Generate SHA256 (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $file = "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe"
-          $hash = Get-FileHash $file -Algorithm SHA256
-          "$($hash.Hash)  $($env:BIN_NAME).exe" |
-            Out-File -Encoding ASCII "$file.sha256"
-
       - name: Upload artifacts (CI)
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.BIN_NAME }}-${{ matrix.target }}
           path: |
-            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}*
+            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
+            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe
 
-      - name: Upload binaries & hashes to Release
+      - name: Upload binaries to Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}*
+            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
+            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe
