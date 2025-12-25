@@ -70,10 +70,26 @@ jobs:
             target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
             target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe
 
+      - name: Package (Linux)
+        if: github.event_name == 'release' && runner.os == 'Linux'
+        run: |
+          cd target/${{ matrix.target }}/release
+          tar -czf \
+            ${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz \
+            ${{ env.BIN_NAME }}
+
+      - name: Package (Windows)
+        if: github.event_name == 'release' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $out = "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}-${{ matrix.target }}.zip"
+          Compress-Archive `
+            -Path "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe" `
+            -DestinationPath $out
+
       - name: Upload binaries to Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
-            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe
+            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}-${{ matrix.target }}.*
