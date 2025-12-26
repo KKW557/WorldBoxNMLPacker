@@ -1,6 +1,6 @@
 [package]
 name = "nmlpack"
-version = "2025.12.3"
+version = "2025.12.4"
 edition = "2024"
 
 [profile.release]

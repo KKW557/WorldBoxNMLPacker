@@ -206,16 +206,20 @@ fn compile(build: &str, pdb: bool, files: &mut Vec<File>) -> Result<()> {
                 target,
             });
             count += 1;
-
-            if pdb {
-                let source = source.with_extension("pdb");
-                if source.exists() {
-                    let target = source.file_name().map(PathBuf::from).unwrap_or_default();
-                    files.push(File { source, target });
-                    count += 1;
-                }
-            }
         };
+    }
+
+    if pdb {
+        let mut pdbs = Vec::new();
+        for file in files.iter().skip(files.len() - count) {
+            let source = file.source.with_extension("pdb");
+            if source.exists() {
+                let target = source.file_name().map(PathBuf::from).unwrap_or_default();
+                pdbs.push(File { source, target });
+            }
+        }
+        count += pdbs.len();
+        files.extend(pdbs);
     }
 
     println!("\nCompiled {} files", count);
