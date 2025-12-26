@@ -13,7 +13,7 @@ A simple CLI tool for packing [WorldBox](https://www.superworldbox.com/) mods th
 Execute the command below from the project root:
 
 ```shell
-nmlpack --compile
+nmlpack -c
 ```
 
 More options:
