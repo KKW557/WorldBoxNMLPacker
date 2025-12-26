@@ -38,7 +38,7 @@ struct Cli {
     output: Option<String>,
 
     /// Whether to include PDB files.
-    #[arg(long, help = "Whether to include PDB files")]
+    #[arg(long, default_value_t = true, help = "Whether to include PDB files")]
     pdb: bool,
 
     /// Source code directories.

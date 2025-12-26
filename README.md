@@ -28,6 +28,7 @@ Options:
   -c, --compile            Whether to build binary
       --include <INCLUDE>  Additional files or directories to include [default: Locals LICENSE default_config.json icon.png mod.json]
   -o, --output <OUTPUT>    The final output path of the packed zip file
+      --pdb                Whether to include PDB files
       --sources <SOURCES>  Source code directories [default: Code code src]
   -h, --help               Print help
   -V, --version            Print version
