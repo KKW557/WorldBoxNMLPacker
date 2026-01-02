@@ -92,4 +92,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            dist/**/${{ env.BIN_NAME }}-*
+            dist/*
