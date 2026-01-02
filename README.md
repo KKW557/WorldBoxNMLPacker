@@ -24,7 +24,7 @@ Usage: nmlpack [OPTIONS]
 
 Options:
       --assets <ASSETS>    Asset directories to be included in the package [default: assets]
-      --build <BUILD>      The command used to build the project [default: "dotnet build"]
+      --build <BUILD>      The command used to build the project [default: "dotnet build -p:DebugType=Portable"]
   -c, --compile            Whether to build binary
       --include <INCLUDE>  Additional files or directories to include [default: Locals LICENSE default_config.json icon.png mod.json]
   -o, --output <OUTPUT>    The final output path of the packed zip file
