@@ -5,14 +5,14 @@ use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
-use std::string::ToString;
 use zip::write::SimpleFileOptions;
 
 #[derive(Parser)]
 #[command(version)]
 struct Cli {
     /// Asset directories to be included in the package.
-    #[arg(long, default_values = &["assets"], help = "Asset directories to be included in the package")]
+    #[arg(long, default_values = &["assets"], help = "Asset directories to be included in the package"
+    )]
     assets: Vec<String>,
 
     /// The command used to build the project
@@ -270,14 +270,18 @@ fn zip(path: &PathBuf, files: &[File]) -> Result<()> {
 
 fn print_packed_message(output: &PathBuf) -> Result<()> {
     let output = if output.is_absolute() {
-        output.display().to_string()
+        output
     } else {
-        std::env::current_dir()
+        &std::env::current_dir()
             .context("Failed to get current directory")?
             .join(output)
-            .display()
-            .to_string()
     };
+
+    let output = output
+        .iter()
+        .map(|s| s.to_string_lossy())
+        .collect::<Vec<_>>()
+        .join(std::path::MAIN_SEPARATOR_STR);
 
     println!(
         "Packed mod at: \x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\",
