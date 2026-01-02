@@ -91,15 +91,11 @@ fn find_file(files: &[File], name: &str) -> Option<PathBuf> {
 const ARROW: &str = " -> ";
 
 fn get_dotnet_build(line: &str) -> Option<PathBuf> {
-    if line.contains(ARROW) {
-        if let Some(part) = line.split(ARROW).last() {
-            let path = PathBuf::from(part.trim());
-            if path.exists() {
-                return Some(path);
-            }
-        }
-    }
-    None
+    line.contains(ARROW)
+        .then(|| line.split(ARROW).last())
+        .flatten()
+        .map(|part| PathBuf::from(part.trim()))
+        .filter(|path| path.exists())
 }
 
 fn collect_files<F>(current: &Path, base: &Path, files: &mut Vec<File>, filter: F) -> Result<()>
