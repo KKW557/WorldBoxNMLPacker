@@ -69,7 +69,7 @@ jobs:
         if: matrix.test && github.ref_type != 'tag'
         run: cargo test --release
 
-      - name: Upload artifacts (CI)
+      - name: Upload artifacts
         if: github.ref_type != 'tag'
         uses: actions/upload-artifact@v4
         with:
@@ -78,35 +78,20 @@ jobs:
             target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
             target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe
 
-      - name: Package (Linux)
-        if: github.ref_type == 'tag' && runner.os == 'Linux'
-        run: |
-          cd target/${{ matrix.target }}/release
-          tar -czf \
-            ${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz \
-            ${{ env.BIN_NAME }}
+  release:
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
 
-      - name: Package (Windows)
-        if: github.ref_type == 'tag' && runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $out = "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}-${{ matrix.target }}.zip"
-          Compress-Archive `
-            -Path "target/${{ matrix.target }}/release/${{ env.BIN_NAME }}.exe" `
-            -DestinationPath $out
-
-      - name: Package (macOS)
-        if: github.ref_type == 'tag' && runner.os == 'macOS'
-        run: |
-          cd target/${{ matrix.target }}/release
-          tar -czf \
-            ${{ env.BIN_NAME }}-${{ matrix.target }}.tar.gz \
-            ${{ env.BIN_NAME }}
-
-      - name: Upload binaries to Release
-        if: github.ref_type == 'tag'
+      - name: Publish
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            target/${{ matrix.target }}/release/${{ env.BIN_NAME }}-${{ matrix.target }}.*
+            dist/**/${{ env.BIN_NAME }}-*
+
