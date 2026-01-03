@@ -1,9 +1,11 @@
+#![feature(normalize_lexically)]
+
 use anyhow::{Context, Result, anyhow, bail};
 use clap::Parser;
 use serde::Deserialize;
 use std::fs;
 use std::io::{BufRead, BufReader};
-use std::path::{Path, PathBuf};
+use std::path::{absolute, Path, PathBuf};
 use std::process::Stdio;
 use zip::write::SimpleFileOptions;
 
@@ -269,19 +271,30 @@ fn zip(path: &PathBuf, files: &[File]) -> Result<()> {
 }
 
 fn print_packed_message(output: &PathBuf) -> Result<()> {
-    let output = if output.is_absolute() {
-        output
-    } else {
-        &std::env::current_dir()
-            .context("Failed to get current directory")?
-            .join(output)
-    };
+    // let output = if output.is_absolute() {
+    //     output.iter()
+    //         .map(|s| s.to_string_lossy())
+    //         .collect::<Vec<_>>()
+    //         .join(std::path::MAIN_SEPARATOR_STR)
+    // } else {
+    //     std::env::current_dir()
+    //         .context("Failed to get current directory")?
+    //         .join(output)
+    //         .display()
+    //         .to_string()
+    // };
 
-    let output = output
-        .iter()
-        .map(|s| s.to_string_lossy())
-        .collect::<Vec<_>>()
-        .join(std::path::MAIN_SEPARATOR_STR);
+    // let output = output
+    //     .iter()
+    //     .map(|s| s.to_string_lossy())
+    //     .collect::<Vec<_>>()
+    //     .join(std::path::MAIN_SEPARATOR_STR);
+
+
+    let output = absolute(output)
+        .context("Failed to absolute path")?
+        .display()
+        .to_string();
 
     println!(
         "Packed mod at: \x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\",
